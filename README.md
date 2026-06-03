@@ -6,6 +6,7 @@ A standalone desktop application for visualizing Microsoft Dataverse table relat
 
 You can package this application into a standalone native application using PyInstaller.
 
+0. Create your venv: `python -m venv venv`, then run `./venv/Scripts/activate`.
 1. Ensure dependencies are installed in your virtual environment (`pip install -r requirements.txt`).
 2. Run the build script for your operating system:
    - **Windows (PowerShell)**: `.\build.ps1`
