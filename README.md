@@ -4,13 +4,17 @@ A standalone desktop application for visualizing Microsoft Dataverse table relat
 
 ## Running as a Desktop App
 
-You can package this application into a standalone `.exe` using PyInstaller.
+You can package this application into a standalone native application using PyInstaller.
 
-1. Ensure dependencies are installed in your virtual environment.
-2. Run the build script in PowerShell: `.\build.ps1`
-3. The executable will be generated at `dist/Dataverse Visualiser/Dataverse Visualiser.exe`.
+1. Ensure dependencies are installed in your virtual environment (`pip install -r requirements.txt`).
+2. Run the build script for your operating system:
+   - **Windows (PowerShell)**: `.\build.ps1`
+   - **macOS / Linux (Bash)**: `chmod +x build.sh` then `./build.sh`
+3. The standalone application will be generated in the `dist` folder:
+   - On **Windows**, you will find `dist/Dataverse Visualiser/Dataverse Visualiser.exe`.
+   - On **macOS**, you will find a native `Dataverse Visualiser.app` bundle in `dist`.
 
-Simply double-click the `.exe` to launch the application.
+Simply double-click the `.exe` or `.app` to launch the application.
 
 
 ## Demo
