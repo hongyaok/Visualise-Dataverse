@@ -6,6 +6,7 @@ nothing is hardcoded. Every call is read-only (GET requests only).
 """
 
 import requests
+import concurrent.futures
 
 
 def _headers(access_token: str) -> dict:
@@ -176,6 +177,33 @@ def get_table_details(
         "Attributes": attributes,
     }
 
+
+def get_all_solution_columns(
+    instance_url: str, access_token: str, solution_id: str
+) -> dict:
+    """
+    Fetch all attributes concurrently for every table in the solution.
+    Returns a dict mapping LogicalName -> list of Attributes.
+    """
+    tables = get_all_tables_in_solution(instance_url, access_token, solution_id)
+    logical_names = [t["LogicalName"] for t in tables]
+
+    results = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_name = {
+            executor.submit(get_table_details, instance_url, access_token, name): name
+            for name in logical_names
+        }
+        for future in concurrent.futures.as_completed(future_to_name):
+            name = future_to_name[future]
+            try:
+                data = future.result()
+                if data:
+                    results[name] = data["Attributes"]
+            except Exception:
+                pass
+
+    return results
 
 # ─── Relationships ────────────────────────────────────────────────────────────
 

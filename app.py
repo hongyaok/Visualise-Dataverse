@@ -177,6 +177,25 @@ def api_table_details(logical_name):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/solution/<solution_id>/columns")
+def api_solution_columns(solution_id):
+    """
+    JSON API — returns all attributes for all tables in a solution.
+    This fetches the details concurrently to speed up response time.
+    """
+    instance_url = session.get("instance_url")
+
+    if not instance_url or not _access_token:
+        return jsonify({"error": "Not authenticated"}), 401
+
+    try:
+        token = _get_token(instance_url)
+        data = dataverse_api.get_all_solution_columns(instance_url, token, solution_id)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/logout")
 def logout():
     """Clear session and reset credential."""

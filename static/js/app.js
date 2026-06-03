@@ -205,6 +205,21 @@ function renderNetwork(container, data, loadingOverlay, statsEl) {
                     'line-color': '#00cec9',
                     'target-arrow-color': '#00cec9'
                 }
+            },
+            {
+                selector: '.search-match',
+                style: {
+                    'border-width': 4,
+                    'border-color': '#f59e0b',
+                    'background-color': isLight ? '#fef3c7' : '#78350f',
+                    'color': isLight ? '#92400e' : '#fef3c7'
+                }
+            },
+            {
+                selector: '.search-dim',
+                style: {
+                    'opacity': 0.15
+                }
             }
         ],
         layout: {
@@ -353,6 +368,84 @@ function closeTableDetails() {
 }
 
 
+// ─── Column Search ────────────────────────────────────────────────────────────
+
+let solutionColumns = null;
+
+function fetchSolutionColumns(solutionId) {
+    const searchInput = document.getElementById('column-search');
+    if (!searchInput) return;
+
+    fetch(`/api/solution/${solutionId}/columns`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) throw new Error(data.error);
+            solutionColumns = data;
+            searchInput.disabled = false;
+            searchInput.placeholder = "Search columns...";
+            
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (!window._cy) return;
+                const cy = window._cy;
+
+                cy.batch(() => {
+                    if (!query) {
+                        cy.elements().removeClass('search-match').removeClass('search-dim');
+                        return;
+                    }
+
+                    // Find tables that have a matching column
+                    const matchingTableIds = new Set();
+                    for (const [tableName, cols] of Object.entries(solutionColumns)) {
+                        for (const col of cols) {
+                            if (col.logical_name && col.logical_name.toLowerCase().includes(query)) {
+                                matchingTableIds.add(tableName);
+                                break;
+                            }
+                        }
+                    }
+
+                    // Also search table names themselves just in case
+                    cy.nodes('[?isTable]').forEach(node => {
+                        const label = node.data('label').toLowerCase();
+                        if (label.includes(query)) {
+                            matchingTableIds.add(node.id());
+                        }
+                    });
+
+                    cy.elements().removeClass('search-match').removeClass('search-dim');
+                    
+                    cy.nodes('[?isTable]').forEach(node => {
+                        if (matchingTableIds.has(node.id())) {
+                            node.addClass('search-match');
+                        } else {
+                            node.addClass('search-dim');
+                        }
+                    });
+                    
+                    // Dim columns that don't match or whose parent is dimmed
+                    cy.nodes('[?isColumn]').forEach(node => {
+                        const parentMatch = matchingTableIds.has(node.data('parent'));
+                        const label = node.data('label').toLowerCase();
+                        if (parentMatch && label.includes(query)) {
+                            node.addClass('search-match');
+                        } else {
+                            node.addClass('search-dim');
+                        }
+                    });
+
+                    // Dim edges
+                    cy.edges().addClass('search-dim');
+                });
+            });
+        })
+        .catch(err => {
+            console.error("Failed to fetch column metadata for search:", err);
+            searchInput.placeholder = "Search unavailable";
+        });
+}
+
 // ─── Flash Message Auto-dismiss ──────────────────────────────────────────────
 
 function initFlashMessages() {
@@ -406,5 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (diagramPage) {
         const solutionId = diagramPage.dataset.solutionId;
         initDiagram(solutionId);
+        
+        // Fetch all columns in the background for searching
+        fetchSolutionColumns(solutionId);
     }
 });
