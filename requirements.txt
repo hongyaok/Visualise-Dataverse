@@ -1,0 +1,8 @@
+flask
+azure-identity
+requests
+python-dotenv
+uvicorn
+gunicorn
+pywebview
+pyinstaller

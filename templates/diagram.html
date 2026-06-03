@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ solution_name }} — Dataverse Visualiser{% endblock %}
+
+{% block head %}
+<!-- Cytoscape for interactive graph rendering -->
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+<script src="https://unpkg.com/cytoscape-dagre/cytoscape-dagre.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="diagram-container" id="diagram-page" data-solution-id="{{ solution_id }}">
+
+    {# ── Toolbar ──────────────────────────────────────────────────────── #}
+    <div class="diagram-toolbar">
+        <div class="diagram-toolbar__left">
+            <a href="{{ url_for('solutions') }}" class="btn btn-ghost btn-sm">← Solutions</a>
+            <span class="diagram-title">{{ solution_name }}</span>
+            <span class="diagram-stats" id="diagram-stats">Loading…</span>
+        </div>
+        <div class="diagram-toolbar__right">
+            <button class="btn btn-ghost btn-sm" id="btn-fit" title="Fit to screen">⊞ Fit</button>
+            <button class="btn btn-ghost btn-sm" id="btn-physics" title="Toggle physics simulation">▶ Physics</button>
+            <button class="btn btn-ghost btn-sm" id="btn-export" title="Export as PNG">📷 Export</button>
+        </div>
+    </div>
+
+    {# ── Network Canvas ───────────────────────────────────────────────── #}
+    <div id="network-canvas"></div>
+
+    {# ── Loading Overlay ──────────────────────────────────────────────── #}
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <span class="loading-text" id="loading-text">Connecting to Dataverse…</span>
+        <span class="loading-subtext" id="loading-subtext">
+            Fetching tables and relationships for this solution.
+            This may take a moment for large solutions.
+        </span>
+    </div>
+
+    {# ── Legend ────────────────────────────────────────────────────────── #}
+    <div class="legend-panel">
+        <div class="legend-panel__title">Legend</div>
+        <div class="legend-item">
+            <span class="legend-dot"></span>
+            Table (entity)
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch legend-swatch--1n"></span>
+            One-to-Many (1:N)
+        </div>
+        <div class="legend-item">
+            <span class="legend-swatch legend-swatch--nn"></span>
+            Many-to-Many (N:N)
+        </div>
+    </div>
+
+    {# ── Table Details Panel ───────────────────────────────────────────── #}
+    <div class="table-details-panel" id="table-details-panel">
+        <button class="btn-close-panel" onclick="closeTableDetails()" title="Close details">✕</button>
+        <div id="table-details-content">
+            <!-- Content populated by JS -->
+        </div>
+    </div>
+
+</div>
+{% endblock %}

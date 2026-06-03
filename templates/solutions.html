@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Select Solution — Dataverse Visualiser{% endblock %}
+
+{% block content %}
+<div class="content-fill">
+
+    <div class="solutions-header">
+        <div>
+            <h1 class="section-title">Select a Solution</h1>
+            <span class="solutions-count" id="solutions-count">{{ solutions | length }} solutions</span>
+        </div>
+        <input
+            type="text"
+            id="solution-search"
+            class="search-input"
+            placeholder="Search solutions…"
+            autocomplete="off"
+        >
+    </div>
+
+    <div class="solutions-grid" id="solutions-grid">
+        {% for sol in solutions %}
+        <a
+            href="{{ url_for('diagram', solution_id=sol.solutionid, name=sol.friendlyname) }}"
+            class="solution-card"
+            data-name="{{ sol.friendlyname }}"
+            data-unique="{{ sol.uniquename }}"
+        >
+            <div class="solution-card__name">{{ sol.friendlyname }}</div>
+            <div class="solution-card__meta">
+                <span>v{{ sol.version }}</span>
+                {% if sol.ismanaged %}
+                    <span class="badge badge--managed">Managed</span>
+                {% else %}
+                    <span class="badge badge--unmanaged">Unmanaged</span>
+                {% endif %}
+            </div>
+            <div class="solution-card__unique">{{ sol.uniquename }}</div>
+        </a>
+        {% endfor %}
+
+        <div class="solutions-empty" id="solutions-empty" style="display: none;">
+            No solutions match your search.
+        </div>
+    </div>
+
+</div>
+{% endblock %}

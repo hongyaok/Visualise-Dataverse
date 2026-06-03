@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Connect — Dataverse Visualiser{% endblock %}
+
+{% block content %}
+<div class="content-center">
+    <div class="glass-card glass-card--wide">
+        <h1 class="page-title">Dataverse Visualiser</h1>
+        <p class="page-subtitle">
+            Connect to your Dataverse environment to explore table relationships
+            within any solution — rendered as an interactive diagram.
+        </p>
+
+        <form action="{{ url_for('connect') }}" method="POST" id="connect-form">
+            <div class="form-group">
+                <label for="instance-url" class="form-label">Dataverse Instance URL</label>
+                <input
+                    type="text"
+                    id="instance-url"
+                    name="instance_url"
+                    class="form-input"
+                    placeholder="https://yourorg.crm.dynamics.com/"
+                    required
+                    autocomplete="url"
+                    autofocus
+                >
+                <p class="form-hint">
+                    Find this in Power Apps → Settings → Session Details → Instance URL
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="connect-btn">
+                <span>⚡</span> Connect &amp; Authenticate
+            </button>
+        </form>
+
+        <p class="form-hint" style="margin-top: 1.5rem; text-align: center;">
+            A Microsoft login window will open for authentication.<br>
+            No secrets or app registrations are required.
+        </p>
+    </div>
+</div>
+{% endblock %}
